@@ -24,13 +24,17 @@
 	<script src="CanvasRenderer.js"></script>
 	<script src="stats.min.js"></script>
 	<script src="tween.min.js"></script>
+	<!-- <script src='threex.domevent.js'></script> -->
 
 	<script>
 
 	var container, stats;
-	var camera, scene, renderer;
+	var camera, scene, renderer, spheres;
+
+	spheres = [];
 
 	var raycaster;
+	var intersection = false;
 	var mouse;
 	var geometry, group;
 	var mouseX = 0, mouseY = 0;
@@ -45,10 +49,12 @@
 			group = new THREE.Group();
 			scene = new THREE.Scene();
 
-			for (var i = 0; i < 100; i++){
-				var geometry = new THREE.SphereGeometry( 5, 30, 30);
+
+
+			for (var i = 0; i < 360; i++){
+				var geometry = new THREE.SphereGeometry( 15, 50, 50);
 				var texture = new THREE.TextureLoader().load( 'images/' + data.filename[i] );
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				var material = new THREE.MeshBasicMaterial({map: texture} );
 				var sphere = new THREE.Mesh( geometry, material );
 				sphere.position.x = data.coord[i][0]*500;
 				sphere.position.y = Math.random() * 800 - 400;
@@ -61,6 +67,7 @@
 				sphere.updateMatrix();
 
 				group.add( sphere );
+				spheres.push(sphere);
 
 			}
 			scene.add( group );
@@ -76,13 +83,13 @@
 		container = document.createElement( 'div' );
 		document.body.appendChild( container );
 
-		camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+		camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 		camera.position.z = 400;
 
 		raycaster = new THREE.Raycaster();
 		mouse = new THREE.Vector2();
 
-		renderer = new THREE.CanvasRenderer();
+		renderer = new THREE.WebGLRenderer();
 		renderer.setClearColor( 0xf0f0f0 );
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( window.innerWidth, window.innerHeight );
@@ -116,14 +123,47 @@
 		}
 
 		function onDocumentMouseDown( event ) {
-			mouseX = ( event.clientX - windowHalfX ) * 10;
-			mouseY = ( event.clientY - windowHalfY ) * 10;
+			mouseX = ( event.clientX - windowHalfX ) * 2;
+			mouseY = ( event.clientY - windowHalfY ) * 2;
 
 			event.preventDefault();
 
 			mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
 			mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
 
+			raycaster.setFromCamera( mouse, camera );
+			var intersections = raycaster.intersectObjects( spheres );
+
+			// the '?' is a ternary operator.
+
+			// ________ ? ____ : ____
+			intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
+
+			if (intersection) {
+				// if(onClick){
+					// camera.position = 检测鼠标位置（x，y，z） z－100；
+				// }
+				console.log('im intersecting!');
+				camera.position.z= raycaster.intersectObjects.position.z-100;
+				// var intersects = raycaster.intersectObjects( scene.children );
+				// new TWEEN.Tween( intersects[ 0 ].object.position ).to( {
+				// 	x: Math.random() * 800 - 400,
+				// 	y: Math.random() * 800 - 400,
+				// 	z: Math.random() * 800 - 400 }, 2000 )
+				// 	.easing( TWEEN.Easing.Elastic.Out).start();
+
+					// new TWEEN.Tween( intersects[ 0 ].object.rotation ).to( {
+					// 	x: Math.random() * 2 * Math.PI,
+					// 	y: Math.random() * 2 * Math.PI,
+					// 	z: Math.random() * 2 * Math.PI }, 2000 )
+					// 	.easing( TWEEN.Easing.Elastic.Out).start();
+
+
+
+				// inserctions[0] will contain the object you're clicking on
+			}
+
+			/*
 			raycaster.setFromCamera( mouse, camera );
 
 			var intersects = raycaster.intersectObjects( scene.children );
@@ -142,17 +182,19 @@
 						.easing( TWEEN.Easing.Elastic.Out).start();
 
 					}
+					*/
 				}
 			}
 
 			function onDocumentMouseMove(event) {
-				mouseX = ( event.clientX - windowHalfX ) * 4;
-				mouseY = ( event.clientY - windowHalfY ) * 4;
+				mouseX = ( event.clientX - windowHalfX ) * 2;
+				mouseY = ( event.clientY - windowHalfY ) * 2;
 			}
 
 			//
 
 			function animate() {
+
 
 				requestAnimationFrame( animate );
 
@@ -171,6 +213,19 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.lookAt( scene.position );
+
+				// raycaster.setFromCamera( mouse, camera );
+				// var intersections = raycaster.intersectObjects( spheres );
+				//
+				// // the '?' is a ternary operator.
+				//
+				// // ________ ? ____ : ____
+				// intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
+				//
+				// if (intersection) {
+				// 	console.log('im intersecting!');
+				// 	console.log(intersection);
+				// }
 
 				var currentSeconds = Date.now();
 				scene.rotation.x = Math.sin( currentSeconds * 0.00001) * 0.9;
