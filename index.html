@@ -42,8 +42,8 @@
 			group = new THREE.Group();
 			scene = new THREE.Scene();
 
-			for (var i = 0; i < 180; i++){
-				var geometry = new THREE.SphereGeometry( 25, 50, 50);
+			for (var i = 0; i < 100; i++){
+				var geometry = new THREE.SphereGeometry( 15, 40, 40);
 				var texture = new THREE.TextureLoader().load( 'images/' + data.filename[i] );
 				var material = new THREE.MeshBasicMaterial({map: texture} );
 				var sphere = new THREE.Mesh( geometry, material );
