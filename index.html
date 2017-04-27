@@ -12,9 +12,43 @@
 		font-weight: bold;
 		overflow:hidden;
 	}
+  .button{
+    background-color: white; /* Green */
+    border: none;
+    position: absolute;
+    left: 30px;
+    color: black;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+    border: 2px solid #555555;
+  }
+
+  .button:hover{
+    background-color:#555555;
+    color:white;
+  }
+  #buttonSphere{
+    top:90%;
+    left:40%;
+  }
+  #buttonCube{
+    top:90%;
+    left:50%;
+  }
+
 	</style>
 </head>
 <body>
+  <button onclick = "setSphere()" class="button" id="buttonSphere" >Sphere</button>
+  <br><br><br>
+  <button onclick = "setCube()" class="button" id="buttonCube">Cube</button>
 	<script
 	src="https://code.jquery.com/jquery-3.2.1.js"
 	integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
@@ -35,15 +69,38 @@
 	var mouseX = 0, mouseY = 0;
 	var windowHalfX = window.innerWidth / 2;
 	var windowHalfY = window.innerHeight / 2;
+  var shapeFlag = 0; // 0 is circle, 1 is box
 
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 	$(window).on('load',function() {
-		$.getJSON( "textures_1.json", function( data ) {
+		rendering();
+	});
+
+  function setSphere(){
+    shapeFlag=0;
+    rendering();
+  }
+
+  function setCube(){
+    shapeFlag=1;
+    rendering();
+  }
+
+	init();
+	animate();
+
+  function rendering() {
+    $.getJSON( "textures_1.json", function( data ) {
 			group = new THREE.Group();
 			scene = new THREE.Scene();
 
 			for (var i = 0; i < 100; i++){
-				var geometry = new THREE.SphereGeometry( 15, 40, 40);
+        if (shapeFlag === 0) {
+          var geometry = new THREE.SphereGeometry( 30, 40, 40);
+        } else {
+          var geometry = new THREE.BoxGeometry( 40, 40, 40);
+        }
+
 				var texture = new THREE.TextureLoader().load( 'images/' + data.filename[i] );
 				var material = new THREE.MeshBasicMaterial({map: texture} );
 				var sphere = new THREE.Mesh( geometry, material );
@@ -62,11 +119,7 @@
 			}
 			scene.add( group );
 		});
-	});
-
-	init();
-	animate();
-
+  }
 	function init() {
 
 		container = document.createElement( 'div' );
@@ -195,5 +248,6 @@
 				renderer.render( scene, camera );
 			}
 			</script>
+
 		</body>
 		</html>
