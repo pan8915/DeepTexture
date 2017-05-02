@@ -36,11 +36,11 @@
   }
   #buttonSphere{
     top:90%;
-    left:40%;
+    left:20%;
   }
   #buttonCube{
     top:90%;
-    left:50%;
+    left:60%;
   }
 
   </style>
@@ -62,13 +62,15 @@
   var camera, scene, renderer, controls, spheres;
   spheres = [];
   var raycaster;
-  var intersection = false;
+  var intersection=null;
   var mouse;
   var geometry, group;
   var mouseX = 0, mouseY = 0;
   var windowHalfX = window.innerWidth / 2;
   var windowHalfY = window.innerHeight / 2;
   var shapeFlag = 0; // 0 is circle, 1 is box
+  var cubeWidth=30;
+
 
 
   document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -94,18 +96,18 @@
       scene = new THREE.Scene();
       scene.background = new THREE.Color( "rgb(176, 224, 230)" );
 
-      for (var i = 0; i < 150; i++){
+      for (var i = 0; i < 120; i++){
         if (shapeFlag === 0) {
-          var geometry = new THREE.BoxGeometry( 30, 30, 30);
+          var geometry = new THREE.BoxGeometry( cubeWidth, cubeWidth, cubeWidth);
         } else {
-          var geometry = new THREE.SphereGeometry( 15, 60, 60);
+          var geometry = new THREE.SphereGeometry( 15, 50, 50);
         }
 
         var texture = new THREE.TextureLoader().load( 'images/' + data.filename[i] );
         var material = new THREE.MeshBasicMaterial({map: texture} );
         var sphere = new THREE.Mesh( geometry, material );
         sphere.position.x = data.coord[i][0]*500;
-        sphere.position.y = Math.random() * 800 - 500;
+        sphere.position.y = Math.random() * 900 - 300;
         sphere.position.z = data.coord[i][1]*500;
 
         sphere.rotation.x = Math.random() * 2 * Math.PI;
@@ -175,12 +177,18 @@
       mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
 
       raycaster.setFromCamera( mouse, camera );
-      var intersections = raycaster.intersectObjects( spheres );
+      var intersections = raycaster.intersectObjects( group.children );
+      //var intersections = raycaster.intersectObjects( spheres );
       intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
 
       if (intersection) {
+        for (var i = 0; i < intersections.length; i++ ){
+        var intersection = intersections[i],
+        obj = intersection.object;
         console.log('im intersecting!');
-        camera.position.z -=250;
+        //camera.position.z -=50;
+        obj.material.color.setRGB(1.0-i/intersections.length,0,0);
+        }
       }
     }
     // LIGHTS
